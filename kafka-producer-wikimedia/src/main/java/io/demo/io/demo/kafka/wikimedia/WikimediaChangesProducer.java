@@ -8,10 +8,11 @@ import org.apache.kafka.common.serialization.StringSerializer;
 
 import java.net.URI;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 public class WikimediaChangesProducer {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
 
 
         String bootstrapServer = "127.0.0.1:9092";
@@ -32,5 +33,7 @@ public class WikimediaChangesProducer {
 
         //start the producer in another thread
         eventSource.start();
+
+        TimeUnit.MINUTES.sleep(10);
     }
 }
