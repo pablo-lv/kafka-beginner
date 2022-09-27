@@ -1,6 +1,12 @@
+### Gradle ###
+.gradle
+**/build/
+!src/**/build/
+
 target/
 *.iml
 .idea/*
-.gradle/*
 kafka-basics/build
 kafka-basics/out
+kafka-producer-wikimedia/build
+kafka-producer-wikimedia/out
