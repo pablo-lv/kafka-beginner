@@ -12,6 +12,8 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.opensearch.action.bulk.BulkRequest;
+import org.opensearch.action.bulk.BulkResponse;
 import org.opensearch.action.index.IndexRequest;
 import org.opensearch.action.index.IndexResponse;
 import org.opensearch.client.OpenSearchClient;
@@ -92,6 +94,8 @@ public class OpenSearchConsumer {
                 int recordCount = records.count();
                 log.info("Received " + recordCount + " record(s)");
 
+                BulkRequest bulkRequest = new BulkRequest();
+
                 for (ConsumerRecord<String, String> record: records) {
 
 //                    String id = record.topic() + "_" + record.partition() + "_" + record.offset();
@@ -103,12 +107,16 @@ public class OpenSearchConsumer {
                                 .source(record.value(), XContentType.JSON)
                                 .id(id);
 
-                        IndexResponse response = openSearchClient.index(indexRequest, RequestOptions.DEFAULT);
-
-                        log.info(response.getId());
+//                        IndexResponse response = openSearchClient.index(indexRequest, RequestOptions.DEFAULT);
+                        bulkRequest.add(indexRequest);
                     } catch (Exception e) {
 
                     }
+                }
+
+                if (bulkRequest.numberOfActions() > 0) {
+                    BulkResponse bulkResponse = openSearchClient.bulk(bulkRequest, RequestOptions.DEFAULT);
+                    log.info("Inserted " + bulkResponse.getItems().length + " records");
                 }
 
                 consumer.commitSync();
